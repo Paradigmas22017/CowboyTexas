@@ -61,7 +61,7 @@ public class Villain extends Agent{
 		}
 		
 		public void action() {
-			System.out.println("Atirando..");
+			System.out.println("Vilão Atirando..");
 			@SuppressWarnings("deprecation")
 			ACLMessage msg = new ACLMessage();
 			msg.setPerformative(ACLMessage.INFORM);
@@ -82,7 +82,7 @@ public class Villain extends Agent{
 		}
 		
 		public void action() {
-			String msgDuel = "Alguém deseja duelar comigo??";
+			String msgDuel = "Vilão diz: Alguém deseja duelar comigo??";
 			@SuppressWarnings("deprecation")
 			ACLMessage msg = new ACLMessage();
 			msg.setPerformative(ACLMessage.PROPOSE);
@@ -97,7 +97,7 @@ public class Villain extends Agent{
 		vGUI = new VillainGui(this);
 		vGUI.showGui();
 		
-		System.out.println("Registrando Heroi no DF");
+		System.out.println("Registrando Vilão no DF");
 		Random rollingDice = new Random();
 		this.accuracy = rollingDice.nextInt(10);
 		this.agility = rollingDice.nextInt(10);
@@ -156,7 +156,7 @@ public class Villain extends Agent{
 								        			if(receivedShot > getPoints()) {
 								        				takeDown();									        			
 								        			} else {
-								        				System.out.println("Vilão vence!");
+								        				//Vilão vence
 								        			}
 								        		}
 								        	}

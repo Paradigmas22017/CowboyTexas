@@ -40,9 +40,7 @@ public class Hero extends Agent {
 		if(msg.getSender() == null) {
 			this.doWait();
 		} else {
-			System.out.println(msg.getSender());
 			this.duelThief = msg.getSender();
-			
 		}
 	}
 	
@@ -59,7 +57,7 @@ public class Hero extends Agent {
 		}
 		
 		public void action() {
-			System.out.println("Atirando..");
+			System.out.println("Herói Atirando..");
 			@SuppressWarnings("deprecation")
 			ACLMessage msg = new ACLMessage();
 			msg.setPerformative(ACLMessage.INFORM);
@@ -80,15 +78,13 @@ public class Hero extends Agent {
 		}
 		
 		public void action() {
-			System.out.println("Aceito seu desafio, seu maltrapilho!");
+			System.out.println("Herói diz: Aceito seu desafio, seu maltrapilho!");
 			@SuppressWarnings("deprecation")
 			ACLMessage msg = new ACLMessage();
 			msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
 			msg.setContent("Aceito seu desafio, seu maltrapilho!");
 			msg.addReceiver(getThiefAID());
-			myAgent.send(msg);
-			System.out.println("Enviando Pontos: " + msg.getContent());
-						
+			myAgent.send(msg);				
 		}
 	}
 
@@ -150,7 +146,7 @@ public class Hero extends Agent {
 									        			if(receivedShot > getPoints()) {
 									        				takeDown();									        			
 									        			} else {
-									        				System.out.println("Heroi vence!");
+									        				// Herói vence
 									        			}
 									        		} 
 									        	}
