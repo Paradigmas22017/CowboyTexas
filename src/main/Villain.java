@@ -11,6 +11,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import main.VillainGui;
 
 public class Villain extends Agent{
 
@@ -24,7 +25,10 @@ public class Villain extends Agent{
 	private int accuracy;
 	private int trickery;
 	private int points;
-	private AID duelThief;
+	private AID duelHero;
+	private static AID [] heroes;
+	
+	private VillainGui vGUI;
 	
 	public int getPoints() {
 		return this.points;
@@ -36,12 +40,16 @@ public class Villain extends Agent{
 		}
 	} 
 	
-	public void getThief(ACLMessage msg) {
+	public void getHero(ACLMessage msg) {
 		if(msg.getSender() == null) {
 			this.doWait();
 		} else {
-			this.duelThief = msg.getSender();
+			this.duelHero = msg.getSender();
 		}
+	}
+	
+	public AID getHeroAID() {
+		return this.duelHero;
 	}
 	
 	class Shoot extends OneShotBehaviour {
@@ -58,14 +66,14 @@ public class Villain extends Agent{
 			ACLMessage msg = new ACLMessage();
 			msg.setPerformative(ACLMessage.INFORM);
 			msg.setContent(Integer.toString(getPoints()));
-			/* myAgent.duelThief*/
+			msg.addReceiver(heroes[1]);
 			myAgent.send(msg);
-			System.out.println("Enviando Pontos: " + msg.getContent());
+			System.out.println("Poder do Vilão: " + msg.getContent());
 						
 		}
 	}
 	
-	class ToChallenge extends OneShotBehaviour {
+	static class ToChallenge extends OneShotBehaviour {
 
 		private static final long serialVersionUID = -6525112407915555924L;
 
@@ -74,24 +82,27 @@ public class Villain extends Agent{
 		}
 		
 		public void action() {
-			String msgDuel = "Você deseja duelar comigo??";
+			String msgDuel = "Alguém deseja duelar comigo??";
 			@SuppressWarnings("deprecation")
 			ACLMessage msg = new ACLMessage();
 			msg.setPerformative(ACLMessage.PROPOSE);
 			msg.setContent(msgDuel);
-			/* myAgent.duelThief*/
+			msg.addReceiver(heroes[1]);
 			myAgent.send(msg);
 			System.out.println(msg.getContent());
 		}
 	}
 
 	protected void setup() {
+		vGUI = new VillainGui(this);
+		vGUI.showGui();
+		
 		System.out.println("Registrando Heroi no DF");
 		Random rollingDice = new Random();
 		this.accuracy = rollingDice.nextInt(10);
 		this.agility = rollingDice.nextInt(10);
 		this.skill = rollingDice.nextInt(10);
-		this.trickery = rollingDice.nextInt(10);;
+		this.trickery = rollingDice.nextInt(15);
 		this.points = this.accuracy + this.agility + this.skill + this.trickery;	
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
@@ -103,9 +114,14 @@ public class Villain extends Agent{
 		try {
 			DFService.register(this, dfd);
 			System.out.println("Criando e adicionando um comportamento!");
+			DFAgentDescription template = new DFAgentDescription();
+			DFAgentDescription[] result = DFService.search(this, template);
+			this.heroes = new AID[result.length];
+			for (int i = 0; i < result.length; ++i) {
+				System.out.println(result[i].getName());
+				heroes[i] = result[i].getName();
+			}
 			
-			ToChallenge tc = new ToChallenge(this);
-			addBehaviour(tc);
 
 			addBehaviour(new MyReceiver(this, -1, 
 					MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL))

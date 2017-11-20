@@ -40,90 +40,16 @@ public class Hero extends Agent {
 		if(msg.getSender() == null) {
 			this.doWait();
 		} else {
+			System.out.println(msg.getSender());
 			this.duelThief = msg.getSender();
-		}
-	}
-	
-/*	
-	class waitingForDuel extends ReceiverBehaviour {
-
-		private static final long serialVersionUID = 3639679338986836773L;
-		public waitingForDuel(Agent a, int time,) {
-			super(a);
-		}
-		
-		public void handle( ACLMessage msg) {
-			System.out.println("Esperando por duelo");
-			if(msg != null) {
-				ACLMessage reply = msg.createReply();
-				if(msg.getPerformative() == ACLMessage.PROPOSE) {
-					String content = msg.getContent();
-					if(content != null) {
-						Random rollingDice = new Random();
-						int acceptingChance = rollingDice.nextInt(100);
-						if (acceptingChance >= 30) {
-							reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-							reply.setContent("Desafio aceito seu maltrapilho!!");
-							receivingShot rS = new receivingShot(myAgent);
-							shoot s = new shoot(myAgent);
-							addBehaviour(s);
-							addBehaviour(rS);
-						} else {
-							reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
-							reply.setContent("Ainda não sou forte o suficiente!");
-						}
-
-					} else {
-						reply.setPerformative(ACLMessage.REFUSE	);
-						reply.setContent("O herói não está na cidade!");
-					}
-					System.out.println("Resposta enviada com sucesso!");
-					System.out.println(reply.getContent());
-					send(reply);
 			
-				} else {
-					reply.setPerformative(ACLMessage.NOT_UNDERSTOOD);
-					reply.setContent("Não entendi sua mensagem");
-				}
-		
-			} else {
-				block();
-			}
 		}
 	}
 	
-	class receivingShot extends CyclicBehaviour {
-
-		private static final long serialVersionUID = -4083197750569324234L;
-		public receivingShot(Agent a) {
-			super(a);
-		}
-		
-		public void action() {
-			System.out.println("Recebendo Tiro..");
-			ACLMessage msg = myAgent.receive();
-			if(msg != null) {
-				ACLMessage reply = msg.createReply();
-				if(msg.getPerformative() == ACLMessage.INFORM) {
-					String content = msg.getContent();
-					System.out.println("Content:" + content);
-					int receivedShot = Integer.parseInt(content); 
-					System.out.println("receivedShot:" + receivedShot);
-					System.out.println("Recebi tiro com força:" + receivedShot);
-					if(receivedShot > getPoints()) {
-						takeDown();
-					} else {
-						System.out.println("O Heroi Venceu!");
-					}
-				} else {
-					reply.setPerformative(ACLMessage.NOT_UNDERSTOOD);
-				}
-			} else {
-				block();
-			}
-		}
+	public AID getThiefAID() {
+		return this.duelThief;
 	}
-*/	
+	
 	class Shoot extends OneShotBehaviour {
 
 		private static final long serialVersionUID = -6525995407915555924L;
@@ -138,7 +64,28 @@ public class Hero extends Agent {
 			ACLMessage msg = new ACLMessage();
 			msg.setPerformative(ACLMessage.INFORM);
 			msg.setContent(Integer.toString(getPoints()));
-			/* myAgent.duelThief*/
+			msg.addReceiver(getThiefAID());
+			myAgent.send(msg);
+			System.out.println("Poder do Heroi: " + msg.getContent());
+						
+		}
+	}
+	
+	class AcceptingDuel extends OneShotBehaviour {
+
+		private static final long serialVersionUID = -6525995407915555924L;
+
+		public AcceptingDuel(Agent a) {
+			super(a);
+		}
+		
+		public void action() {
+			System.out.println("Aceito seu desafio, seu maltrapilho!");
+			@SuppressWarnings("deprecation")
+			ACLMessage msg = new ACLMessage();
+			msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+			msg.setContent("Aceito seu desafio, seu maltrapilho!");
+			msg.addReceiver(getThiefAID());
 			myAgent.send(msg);
 			System.out.println("Enviando Pontos: " + msg.getContent());
 						
@@ -178,9 +125,11 @@ public class Hero extends Agent {
 			        		else {
 			        			Random rollingDice = new Random();
 								int acceptingChance = rollingDice.nextInt(100);
-								if (acceptingChance >= 30) {
-									System.out.println("Aceito seu desafio, seu maltrapilho!");
+								if (acceptingChance >= 0) {
+									getThief(msg);
+									AcceptingDuel aD = new AcceptingDuel(myAgent);
 									Shoot s = new Shoot(myAgent);
+									addBehaviour(aD);
 									addBehaviour(s);
 									addBehaviour(new MyReceiver(myAgent, -1, 
 											MessageTemplate.MatchPerformative(ACLMessage.INFORM))
