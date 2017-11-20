@@ -36,7 +36,7 @@ public class Hero extends Agent {
 			ACLMessage msg = myAgent.receive();
 			if(msg != null) {
 				ACLMessage reply = msg.createReply();
-				if(msg.getPerformative() == ACLMessage.REQUEST) {
+				if(msg.getPerformative() == ACLMessage.PROPOSE) {
 					String content = msg.getContent();
 					if(content != null) {
 						Random rollingDice = new Random();
@@ -44,7 +44,6 @@ public class Hero extends Agent {
 						if (acceptingChance >= 30) {
 							reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
 							reply.setContent("Desafio aceito seu maltrapilho!!");
-							System.out.println(getPoints());
 						} else {
 							reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
 							reply.setContent("Ainda não sou forte o suficiente!");
