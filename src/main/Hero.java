@@ -24,9 +24,24 @@ public class Hero extends Agent {
 	private int accuracy;
 	private int trickery;
 	private int points;
+	private AID duelThief;
 	
 	public int getPoints() {
 		return this.points;
+	}
+	
+	public void verifyShootMsg(ACLMessage msg) {
+		if(msg.getContent() == null) {
+			this.doWait();
+		}
+	} 
+	
+	public void getThief(ACLMessage msg) {
+		if(msg.getSender() == null) {
+			this.doWait();
+		} else {
+			this.duelThief = msg.getSender();
+		}
 	}
 	
 /*	
@@ -123,6 +138,7 @@ public class Hero extends Agent {
 			ACLMessage msg = new ACLMessage();
 			msg.setPerformative(ACLMessage.INFORM);
 			msg.setContent(Integer.toString(getPoints()));
+			/* myAgent.duelThief*/
 			myAgent.send(msg);
 			System.out.println("Enviando Pontos: " + msg.getContent());
 						
@@ -179,6 +195,7 @@ public class Hero extends Agent {
 									        		if (msg == null) 
 									        			System.out.println("Timeout");
 									        		else {
+									        			verifyShootMsg(msg);
 									        			String content = msg.getContent();
 									        			int receivedShot = Integer.parseInt(content);
 									        			if(receivedShot > getPoints()) {
@@ -193,8 +210,8 @@ public class Hero extends Agent {
 			        		} 
 			        	}
 					});
-		} catch(Exception e) {
-			
+		} catch(FIPAException e) {
+			e.printStackTrace();
 		}
 	
 	}
